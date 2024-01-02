@@ -1,0 +1,233 @@
+\documentclass[xcolor=dvipsnames]{beamer}
+
+%packages
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{hyperref}
+\usepackage[english]{babel}
+\usepackage{csquotes}
+
+\usepackage[
+    type={CC},
+    modifier={by-nc-sa},
+    version={4.0},
+]{doclicense}
+
+\newcommand{\ios}{\dot{\imath}\mathcal{O}}
+\newcommand{\io}[1]{\dot{\imath}\mathcal{O}(#1)}
+\newcommand{\As}{\mathcal{A}}
+\newcommand{\A}[1]{\mathcal{A}(#1)}
+
+\definecolor{cyan}{rgb}{0.0, 0.49411764705882355, 0.5215686274509804}
+
+\usecolortheme[named=cyan]{structure}
+
+\hypersetup{
+    colorlinks = true,
+    linkcolor  = cyan,
+    filecolor  = cyan,      
+    urlcolor   = cyan,
+}
+
+\title{Concurrent Computation of Binomial Coefficient}
+\author{Dimitrios Yfantidis (3938)}
+\institute{Aristotle University of Thessaloniki, \\
+Faculty of Sciences, Department of Informatics}
+\date{January 2024}
+
+\begin{document}
+
+\maketitle
+
+\begin{frame}
+\titlepage
+{\small
+\doclicenseThis
+}
+\end{frame}
+
+\begin{frame}{Abstract}
+    This presentation accounts for an academic assignment on the lesson 
+    \textbf{Concurrent Programming \& Software Safety}. 
+    
+    \pause
+    \hfill
+
+    The assignment in question mainly demands the implementation of a concurrent 
+    program, as formulated by Manna \& Pnueli, to compute the binomial coefficient:
+    
+\[
+    \binom{n}{k} = \frac{n!}{(n-k)! \cdot k!} = 
+    \frac{n \cdot (n-2) \cdot ... \cdot (n-k+1)}{1 \cdot 2 \cdot ... \cdot k}
+\]
+
+\end{frame}
+
+\begin{frame}{Assignment Prompt}
+    \begin{itemize}
+        \item<1-> \textbf{Hypothesis:} Suppose that one procedure computes the numerator while another procedure computes the denominator.
+        \item<2-> \textbf{Tip:} 
+        Prove that $i!$ is a divisor of $j \cdot (j+1) \cdot ... \cdot (j + i - 1)$. 
+        This way the numerator's procedure can fetch partially computed results from 
+        the denominator's procedure and performs the division immediately, so that 
+        its partially computed results don't grow too big. E.g: $1 \cdot 2$ divides 
+        $10 \cdot 9$, $1 \cdot 2 \cdot 3$ divides $10 \cdot 9 \cdot 8$, etc.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Mathematical Preliminary Work}
+    \begin{enumerate}
+        \item Argument $\mathcal{I}(i, j)$: 
+        \[
+            i! \mid j \cdot (j + 1) \cdot ... \cdot (j + i -1)
+        \]
+        \item Suppose $f:\mathbb{N}\times \mathbb{N} \rightarrow \mathbb{N}$ and
+        \[
+            f(m, n) = m \cdot (m + 1) \cdot ... \cdot (m + n - 1) = 
+            \prod_{k=0}^{n-1}(m + k)
+        \]
+        \item Argument $\mathcal{I}(i, j)$ can be written as:
+        \[
+            i! \mid f(j, i)
+        \]
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}{Mathematical Preliminary Work}
+    \textbf{Induction by i}
+    \begin{itemize}
+        \item Trivial case, $\mathcal{I}(1, j)$: 
+        $1! | f(j, 1) \Leftrightarrow 1 | j$ (true $\forall j \in \mathbb{N}$)
+        \item Induction hypothesis: $i! \mid f(j, i)$
+        \item Induction step: $i \rightarrow i + 1$
+    \end{itemize}
+
+    \pause
+
+    \hfill
+
+    \textbf{Induction by j (within the induction step of i)}
+    \begin{itemize}
+        \item Trivial case, $\mathcal{I}(i+1, 0)$: \\
+        \[
+            f(0, i+1) = 0 \cdot (0 + 1) \cdot ... \cdot (0 + i) = 0, \forall i \in \mathbb{N}
+        \]
+        Thus, the argument $\mathcal{I}(i+1, 0)$ holds true as $(i+1)! \mid 0, \forall i$
+        \item Induction hypothesis: $(i+1)! \mid f(j, i+1)$
+        \item Induction step: $j \rightarrow j + 1$
+        { \small
+        \begin{align*}
+            f(j+1, i+1) &= (j+1) \cdot \bigl[(j+1) + 1\bigr] \cdot ... \cdot 
+            \bigl[(j+1) + (i+1) - 1\bigr] \\
+            &= (j+1) \cdot (j+2) \cdot ... \cdot (j+i) \cdot (j+i+1) \\
+            &= (i+1)\cdot(j+1)\cdot ... \cdot (j+i) + j \cdot (j+1) \cdot ... \cdot (j+i) \\
+            &= (i+1)\cdot f(j+1, i) + f(j, i+1)
+        \end{align*}
+        }
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Mathematical Preliminary Work}
+\begin{itemize}
+    \item<1-> The first term is divisible by $(i+1)!$ because of the induction hypothesis for $i$, thus:
+    \[
+        (i+1)! \mid (i+1)\cdot f(j+1, i)
+    \]
+    \item<2-> The second term is divisible by $(i+1)!$ because of the induction hypothesis for $j$, thus:
+    \[
+        (i+1)! \mid f(j, i+1)
+    \]
+    \item<3-> As a consequence:
+    \[
+        (i+1)! \mid (i+1)\cdot f(j+1, i) + f(j, i+1) = f(j+1, i+1)
+    \]
+    and so the argument $\mathcal{I}(i+1, j+1)$ holds true.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Moving Forward}
+	\textbf{Lemma:} We have proved that the product of $n$ consecutive integers is divisible by $n!$.
+	
+	\hfill
+	
+	\pause
+	
+	\textbf{Next steps (citing Manna \& Pnueli):} 
+	\begin{itemize}
+		\item<2-> As mentioned in the beginning, process $P_1$ computes the numerator of the formula by successively multiplying into an integer variable, $b$, the factors $n$, $n-1$, ..., $n-k+1$. These factors are successively computed in variable $y_1$.
+		
+		\item<3-> Process $P_2$, responsible for the denominator, successively divides $b$ by the factors $1$, $2$, ..., $k$, using integer division. These factors are successively computed in variable $y_2$. 
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Algorithm Correctness}
+\textbf{Citing Manna \& Pnueli:}
+ 
+\hfill
+
+\textit{``For the algorithm to be correct, it is necessary that whenever integer division is applied it yields no remainder. We rely here on a general property of integers by which a product of $m$ consecutive integers is evenly divisible by $m!$."}
+
+\hfill
+\pause
+
+\textit{``Thus, $b$ should be divided by $y_2$, which completes the stage of dividing $b$ by $y_2!$, only when at least $y_2$ factors have already been multiplied into $b$ by $P_1$. Since $P_1$ multiplies $b$ by $n$, $n-1$, etc., and $y_1$ is greater than or equal to the value of the next factor to be multiplier, the number of factors that have been multiplied into $b$ is at least $n-y_1$."}
+
+\end{frame}
+
+\begin{frame}{Algorithm Correctness}
+\textit{``Therefore, $y_2$ divides $b$ as soon as $y_2 \leq n - y_1$, or equivalently, $y_1 + y_2 \leq n$. This condition, tested at statement $m_1$, ensures that b is divided by $y_2$ only when it is safe to do so."}
+
+\hfill
+\pause
+
+\textit{``The semaphore statements at $l_1$ and $m_2$ protect the regions $l_{2,3}$ and $m_{3,4}$ from interference. They guarantee that the value of $b$ is not modified between its retrieval at $l_2$ and $m_3$ and its updating at $l_3$ and $m_4$."}
+
+
+\end{frame}
+
+\begin{frame}{Algorithm Formulation}
+
+\begin{center}
+	\begin{tabular}{|l|l|}
+	\hline
+	\multicolumn{2}{|l|}{\textbf{Input:} $k, n \in \mathbb{N}$, $0 \leq k \leq n$} \\
+	\multicolumn{2}{|l|}{\textbf{Output:} $b \in \mathbb{N}$} \\
+	\multicolumn{2}{|l|}{\textbf{Locals:} $y_1, y_2 \in \mathbb{N}$, mutex: $r$} \\
+	\multicolumn{2}{|l|}{\textbf{Initialization:} $y_1 \coloneqq n$, $y_2 \coloneqq 1$, $b \coloneqq 1$} \\
+	
+	\hline
+	\multicolumn{1}{|c|}{p1} & \multicolumn{1}{|c|}{p2}\\
+	\hline
+	\textbf{local} t1: \textbf{integer} & \textbf{local} t2: \textbf{integer} \\
+	$l_0:$ \textbf{while} $y_1 > (n - k)$ \textbf{do}: & $m_0:$ \textbf{while} $y_2 \leq k$ \textbf{do}: \\
+	$l_1:$\phantom{1111}\textbf{request} r & $m_1:$\phantom{1111}\textbf{await} $y_1 + y_2 \leq n$\\
+	$l_2:$\phantom{1111}$t_1 \coloneqq b \cdot y_1$ & $m_2:$\phantom{1111}\textbf{request} r \\
+	$l_3:$\phantom{1111}$b \coloneqq t_1$ & $m_3:$\phantom{1111}$t_2 \coloneqq b \; div \; y_2$ \\
+	$l_4:$\phantom{1111}\textbf{release} r & $m_4:$\phantom{1111}$b \coloneqq t_2$\\
+	$l_5:$\phantom{1111}$y_1 \coloneqq y_1 - 1$ & $m_5:$\phantom{1111}\textbf{release} r\\
+	$l_6:$ & $m_6:$\phantom{1111}$y_2 \coloneqq y_2 + 1$\\
+	\phantom{1111} & $m_7:$\\
+	\hline
+		
+	
+	\end{tabular}
+\end{center}
+
+\end{frame}
+
+\begin{frame}{References}
+
+\begin{enumerate}
+	\item Nurdin Takenov (2017)\\
+	\href{https://math.stackexchange.com/questions/12065/the-product-of-n-consecutive-integers-is-divisible-by-n-factorial}{\textit{``The product of $n$ consecutive integers is divisible by $n$ factorial"}}
+	
+	\item Zohar Manna, Amir Pnueli (1995)\\
+	\href{http://tinyurl.com/3467npny}{\textit{``Temporal Verification of Reactive Systems: Safety"}}
+	
+\end{enumerate}
+
+\end{frame}
+
+\end{document}
