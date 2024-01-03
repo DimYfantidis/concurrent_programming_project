@@ -39,8 +39,6 @@ Faculty of Sciences, Department of Informatics}
 
 \begin{document}
 
-\maketitle
-
 \begin{frame}
 \titlepage
 {\small
@@ -77,13 +75,35 @@ Faculty of Sciences, Department of Informatics}
     \end{itemize}
 \end{frame}
 
-\begin{frame}{Mathematical Preliminary Work}
+\begin{frame}{Mathematical Preliminary Work (1st Proof)}
+	\begin{enumerate}
+		\item Consider the following numeric expression:
+		\[
+			Q = \prod_{k=0}^{i-1}\left(j+k\right) =
+			j \cdot (i+1) \cdot ... \cdot (j+i-2) \cdot (j+i-1)
+		\]
+		\item Assign $u \coloneqq j+i-1 \Rightarrow j = u-i+1$, thus:
+		\[
+			Q = (u-i+1) \cdot (u-i+2) \cdot ... \cdot (u-1) \cdot u = 
+			\frac{u!}{(u - i)!}
+		\]
+		\item Consequently:
+		\[
+			\frac{1}{i!} \prod_{k=0}^{i-1}\left(j+k\right) =  
+			\frac{Q}{i!} = \frac{u!}{(u-i)!i!} = \binom{u}{i} = 
+			\binom{j+i-1}{i} \in \mathbb{Z}
+		\]
+		Proving that $i! \; \mid \; j \cdot (j+1) \cdot ... \cdot (j + i - 1)$
+	\end{enumerate}
+\end{frame}
+
+\begin{frame}{Mathematical Preliminary Work (2nd Proof)}
     \begin{enumerate}
         \item Argument $\mathcal{I}(i, j)$: 
         \[
             i! \mid j \cdot (j + 1) \cdot ... \cdot (j + i -1)
         \]
-        \item Suppose $f:\mathbb{N}\times \mathbb{N} \rightarrow \mathbb{N}$ and
+        \item Suppose $f:\mathbb{N}^2 \rightarrow \mathbb{N}$ and
         \[
             f(m, n) = m \cdot (m + 1) \cdot ... \cdot (m + n - 1) = 
             \prod_{k=0}^{n-1}(m + k)
@@ -95,7 +115,7 @@ Faculty of Sciences, Department of Informatics}
     \end{enumerate}
 \end{frame}
 
-\begin{frame}{Mathematical Preliminary Work}
+\begin{frame}{Mathematical Preliminary Work (2nd Proof)}
     \textbf{Induction by i}
     \begin{itemize}
         \item Trivial case, $\mathcal{I}(1, j)$: 
@@ -129,7 +149,7 @@ Faculty of Sciences, Department of Informatics}
     \end{itemize}
 \end{frame}
 
-\begin{frame}{Mathematical Preliminary Work}
+\begin{frame}{Mathematical Preliminary Work (2nd Proof)}
 \begin{itemize}
     \item<1-> The first term is divisible by $(i+1)!$ because of the induction hypothesis for $i$, thus:
     \[
@@ -207,8 +227,8 @@ Faculty of Sciences, Department of Informatics}
 	$l_3:$\phantom{1111}$b \coloneqq t_1$ & $m_3:$\phantom{1111}$t_2 \coloneqq b \; div \; y_2$ \\
 	$l_4:$\phantom{1111}\textbf{release} r & $m_4:$\phantom{1111}$b \coloneqq t_2$\\
 	$l_5:$\phantom{1111}$y_1 \coloneqq y_1 - 1$ & $m_5:$\phantom{1111}\textbf{release} r\\
-	$l_6:$ & $m_6:$\phantom{1111}$y_2 \coloneqq y_2 + 1$\\
-	\phantom{1111} & $m_7:$\\
+	$l_6:$ \textbf{end-while} & $m_6:$\phantom{1111}$y_2 \coloneqq y_2 + 1$\\
+	\phantom{1111} & $m_7:$ \textbf{end-while}\\
 	\hline
 		
 	
@@ -220,10 +240,11 @@ Faculty of Sciences, Department of Informatics}
 \begin{frame}{References}
 
 \begin{enumerate}
-	\item Nurdin Takenov (2017)\\
+	\item J. M. ain't a mathematician;
+ Nurdin Takenov\\
 	\href{https://math.stackexchange.com/questions/12065/the-product-of-n-consecutive-integers-is-divisible-by-n-factorial}{\textit{``The product of $n$ consecutive integers is divisible by $n$ factorial"}}
 	
-	\item Zohar Manna, Amir Pnueli (1995)\\
+	\item Zohar Manna; Amir Pnueli (1995)\\
 	\href{http://tinyurl.com/3467npny}{\textit{``Temporal Verification of Reactive Systems: Safety"}}
 	
 \end{enumerate}

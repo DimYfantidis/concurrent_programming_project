@@ -22,24 +22,17 @@ void* numerator_process(void* args)
 {
     uint64_t t1;
 
-    // printf("l0: Y1=%"PRIu64", Y2=%"PRIu64", b=%"PRIu64"\n", Y1, Y2, b);
     while (Y1 > n - k)
     {
-        // printf("l1: Y1=%"PRIu64", Y2=%"PRIu64", b=%"PRIu64"\n", Y1, Y2, b);
         pthread_mutex_lock(&criticalMutex);
-        // printf("l2: Y1=%"PRIu64", Y2=%"PRIu64", b=%"PRIu64"\n", Y1, Y2, b);
         t1 = b * Y1;
-        // printf("l3: Y1=%"PRIu64", Y2=%"PRIu64", b=%"PRIu64"\n", Y1, Y2, b);
         b = t1;
-        // printf("l4: Y1=%"PRIu64", Y2=%"PRIu64", b=%"PRIu64"\n", Y1, Y2, b);
         pthread_mutex_unlock(&criticalMutex);
-        // printf("l5: Y1=%"PRIu64", Y2=%"PRIu64", b=%"PRIu64"\n", Y1, Y2, b);
         pthread_mutex_lock(&valueMutex);
         Y1--;
         pthread_mutex_unlock(&valueMutex);
         pthread_cond_signal(&valueCondition);
     }
-    // printf("l6: Y1=%"PRIu64", Y2=%"PRIu64", b=%"PRIu64"\n", Y1, Y2, b);
     return NULL;
 }
 
@@ -47,27 +40,19 @@ void* denominator_process(void* args)
 {
     uint64_t t2;
 
-    // printf("m0: Y1=%"PRIu64", Y2=%"PRIu64", b=%"PRIu64"\n", Y1, Y2, b);
     while (Y2 <= k)
     {
-        // printf("m1: Y1=%"PRIu64", Y2=%"PRIu64", b=%"PRIu64"\n", Y1, Y2, b);
         pthread_mutex_lock(&valueMutex);
         while (Y1 + Y2 > n) {
             pthread_cond_wait(&valueCondition, &valueMutex);
         }
         pthread_mutex_unlock(&valueMutex);
-        // printf("m2: Y1=%"PRIu64", Y2=%"PRIu64", b=%"PRIu64"\n", Y1, Y2, b);
         pthread_mutex_lock(&criticalMutex);
-        // printf("m3: Y1=%"PRIu64", Y2=%"PRIu64", b=%"PRIu64"\n", Y1, Y2, b);
         t2 = b / Y2;
-        // printf("m4: Y1=%"PRIu64", Y2=%"PRIu64", b=%"PRIu64"\n", Y1, Y2, b);
         b = t2;
-        // printf("m5: Y1=%"PRIu64", Y2=%"PRIu64", b=%"PRIu64"\n", Y1, Y2, b);
         pthread_mutex_unlock(&criticalMutex);
-        // printf("m6: Y1=%"PRIu64", Y2=%"PRIu64", b=%"PRIu64"\n", Y1, Y2, b);
         Y2++;
     }
-    // printf("m7: Y1=%"PRIu64", Y2=%"PRIu64", b=%"PRIu64"\n", Y1, Y2, b);
     return NULL;
 }
 

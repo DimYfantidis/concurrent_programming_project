@@ -43,37 +43,6 @@ void* compute_denominator(void* args)
     return (void *)prod;
 }
 
-uint64_t bcoef_serial(uint64_t n, uint64_t k)
-{
-    uint64_t k_i = 2;
-    uint64_t n_i = n-k+1;
-    uint64_t prod = 1;
-
-    while (k_i <= k && n_i <= n)
-    {
-        if (prod % k_i == 0) 
-        {
-            prod /= k_i;
-            k_i++;
-        }
-        else
-        {
-            prod *= n_i;
-            n_i++;
-        }
-    }
-    while (k_i <= k)
-    {
-        prod /= k_i;
-        k_i++;
-    }
-    while (n_i <= n)
-    {
-        prod *= n_i;
-        n_i++;
-    }
-    return prod;
-}
 
 int main(int argc, char* argv[])
 {
