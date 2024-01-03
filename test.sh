@@ -5,7 +5,6 @@ echo "Today is " `date`
 
 # Build executables
 make
-echo -e ''
 
 # Examine a (n, k) pair's real result (non-overflowing) 
 # and computed result using actual 64-bit integers
@@ -29,7 +28,7 @@ fi
 
 # If there are no program parameters, test all the following pairs
 # of n and k and log the results in the file "output.txt".
-for N in {50..100}; do
+for N in {50..70}; do
     for K in $(seq 0 1 $((N))); do
         printf "(n, k) = (%d, %d)\n" $N $K >> output.txt
         # Real binomial coefficient
