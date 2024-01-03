@@ -3,4 +3,4 @@
 - Program source code found in `bincoef.c` and `manna_pnueli.c`
 - Built using Makefile
 - Testing done with the bash script `test.sh`
-- Project report written in latex, found in `./report/` (pdf & source)
+- Project report written in latex, pdf found in `./report/`
